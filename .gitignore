@@ -13,3 +13,5 @@ Thumbs.db
 .idea/
 apps/desktop/src-tauri/target/
 apps/desktop/src-tauri/gen/
+package-lock.json
+yarn.lock

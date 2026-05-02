@@ -5,3 +5,5 @@ export * from "./adapters/anthropic";
 export * from "./adapters/copilot";
 export * from "./adapters/openrouter";
 export * from "./adapters/ollama";
+export * from "./adapters/server";
+export * from "./adapters/groq";

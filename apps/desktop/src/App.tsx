@@ -1,17 +1,12 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-
-type RouteDecision = {
-  provider: string;
-  model: string;
-  confidence: number;
-};
+import { Chat } from "./components/Chat";
+import { AuthBar } from "./components/AuthBar";
+import { useAuthStore } from "./stores/authStore";
 
 export function App() {
-  const [prompt, setPrompt] = useState("");
-  const [decision, setDecision] = useState<RouteDecision | null>(null);
-  const [routerVersion, setRouterVersion] = useState<string>("loading…");
-  const [busy, setBusy] = useState(false);
+  const [routerVersion, setRouterVersion] = useState("loading…");
+  const initAuthListener = useAuthStore((s) => s.initAuthListener);
 
   useEffect(() => {
     invoke<string>("router_version")
@@ -19,38 +14,23 @@ export function App() {
       .catch((e) => setRouterVersion(`error: ${e}`));
   }, []);
 
-  async function route() {
-    setBusy(true);
-    try {
-      const d = await invoke<RouteDecision>("route_prompt", { prompt });
-      setDecision(d);
-    } finally {
-      setBusy(false);
-    }
-  }
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+    initAuthListener().then((u) => (unlisten = u));
+    return () => unlisten?.();
+  }, [initAuthListener]);
 
   return (
     <div className="app">
-      <header>
-        <h1>PromptRoute</h1>
-        <span className="version">router {routerVersion}</span>
+      <header className="app-header">
+        <div className="app-brand">
+          <h1>PromptRoute</h1>
+          <span className="app-tagline">offline router · {routerVersion}</span>
+        </div>
+        <AuthBar />
       </header>
-      <main>
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Type a prompt — router picks the best model offline."
-        />
-        <button onClick={route} disabled={!prompt || busy}>
-          {busy ? "routing…" : "Route"}
-        </button>
-        {decision && (
-          <pre className="decision">
-            {decision.provider} / {decision.model}
-            {"  "}
-            ({(decision.confidence * 100).toFixed(1)}%)
-          </pre>
-        )}
+      <main className="app-main">
+        <Chat />
       </main>
     </div>
   );

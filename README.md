@@ -55,12 +55,21 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full format spec, featu
 3. Newer + sha256 matches → write to `%APPDATA%/promptroute/models/`. Loaded next boot.
 4. No network or hash mismatch → bundled copy keeps working forever.
 
+## Sign-in & default model
+
+PromptRoute reuses the **PromptPack** Clerk account. Click *Sign in with PromptPack* → opens system browser to `https://pmtpk.com/desktop-auth?source=desktop&app=promptroute` → completes auth → callback hits `promptroute://auth?token=…` deep link → tier is fetched and synced.
+
+Without sign-in or a configured provider key, every chat is routed to the `server` provider, which calls `https://api.pmtpk.com/chat`. That endpoint forwards to **Groq** server-side using a key held on the PromptPack backend — **the Groq key is never bundled in this open-source repo**. Tier limits (free = 3 messages, Pro = 200, Studio = 2000) are enforced both client-side (for fast UX) and server-side (authoritative).
+
+Bring-your-own-key adapters live in [`packages/providers/src/adapters/`](packages/providers/src/adapters/) and unlock when the user pastes a key in Settings: OpenAI, Anthropic, Groq (direct), OpenRouter, Copilot, Ollama (local).
+
 ## Status
 
-Alpha scaffold. Routing core + provider adapters wired; tool handlers (read/edit/bash) and OAuth flows are stubs awaiting wiring to Tauri plugins. The bundled `router.pk1` is a hand-written placeholder, not a trained model.
+Alpha. The chat UX, sign-in deep link, tier gating, and offline router are all wired. Tool handlers (read/edit/bash) and the agent loop are still scaffolds. The bundled `router.pk1` is a hand-written placeholder — train a real one before depending on its decisions.
 
 Roadmap:
 - [ ] Wire `read`/`edit`/`bash` tools to Tauri fs + shell plugins
+- [ ] Streaming responses (server endpoint currently returns one JSON blob)
 - [ ] GitHub device-code OAuth → Copilot token exchange
 - [ ] OpenAI session-token bridge for ChatGPT Plus/Pro
 - [ ] Train real `.pk1` from public benchmark traces
