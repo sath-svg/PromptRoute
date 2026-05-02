@@ -35,8 +35,5 @@
       "icons/icon.ico"
     ]
   },
-  "plugins": {
-    "fs": { "scope": ["$APPDATA/**", "$RESOURCE/**"] },
-    "http": { "scope": ["https://api.pmtpk.com/*"] }
-  }
+  "plugins": {}
 }
