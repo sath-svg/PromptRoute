@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "url": "https://api.pmtpk.com/models/router.pk1",
+  "sha256": "<fill-on-server-publish>",
+  "classMapUrl": "https://api.pmtpk.com/models/router.classes.json",
+  "classMapSha256": "<fill-on-server-publish>",
+  "releasedAt": "2026-05-02T06:07:53.358Z"
+}
